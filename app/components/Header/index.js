@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import CreateWalletModal from "../Create-wallet";
 import CreateAuditModal from "../create-audit-trail";
+import CreateCertificateModal from "../create-certificate";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [isCertificateModalOpen, setIsCertificateModalOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -18,12 +20,20 @@ const Header = () => {
     setIsAuditModalOpen(true);
   }
 
+  const openCertificateModal = () => {
+    setIsCertificateModalOpen(true);
+  }
+
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
   const closeAuditModal = () => {
     setIsAuditModalOpen(false);
+  };
+
+  const closeCertificateModal = () => {
+    setIsCertificateModalOpen(false);
   };
 
   const handleSubmit = async (data) => {
@@ -74,6 +84,80 @@ const Header = () => {
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error("🦄 Error creating user", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  };
+
+  // create certificate funciton
+  const handleCertificateSubmit = async (data) => {
+    try {
+      const payload = {
+        walletAddress: data.walletAddress,
+        to:data.to,
+        contractAddress: data.contractAddress,
+        file: data.file,
+        name: data.name,
+        description: data.description,
+        callback_url: "https://postman-echo.com/post?"  // Ensure this is added to the payload
+      };
+  
+      console.log("Sending data:", JSON.stringify(payload));
+     const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
+      {
+        method: "POST",
+        headers: {
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+     );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Server responded with:", errorData);
+        throw new Error("Failed to create certificate");
+      }
+
+      const result = await response.json();
+
+      const certificateId = result.result.transactionHash;
+
+      sessionStorage.setItem("certificateId", certificateId);
+
+      if (!certificateId) {
+        throw new Error("Certificate ID not found in the response");
+      }
+      toast.success(
+        `🦄 Certificate created successfully!
+        Certificate ID: ${certificateId}`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeCertificateModal();
+    } catch (error) {
+      console.error("Error creating certificate from catch:", error);
+      toast.error("🦄 Error creating certificate from catch", {
         position: "bottom-center",
         autoClose: 5000,
         hideProgressBar: false,
@@ -191,6 +275,14 @@ const Header = () => {
           >
             Create Audit
           </button>
+
+          {/* Create Certificate Button */}
+          <button
+            onClick={openCertificateModal} // Function to open the certificate modal
+            className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+          >
+            Create Certificate
+          </button>
         </div>
       </div>
       <AnimatePresence>
@@ -220,6 +312,22 @@ const Header = () => {
             />
           </motion.div>
         )}
+
+        {/* Certificate Modal */}
+        {isCertificateModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+          >
+            <CreateCertificateModal
+              onSubmit={handleCertificateSubmit} // Function to handle audit form submission
+              onClose={closeCertificateModal} // Function to close the audit modal
+            />
+          </motion.div>
+        )}
+
       </AnimatePresence>
       <ToastContainer
         position="bottom-center"
