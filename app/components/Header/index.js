@@ -88,10 +88,18 @@ const Header = () => {
     }
   };
 
-  const handleAuditSubmit = async (data, file) => {
+  const handleAuditSubmit = async (data) => {
     try {
+      const payload = {
+        wallet_address: data.wallet_address,
+        contract_address: data.contract_address,
+        metadata: data.metadata,
+        callback_url: "https://postman-echo.com/post?"  // Ensure this is added to the payload
+      };
+  
+      console.log("Sending data:", JSON.stringify(payload));
      const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/audit/audit`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/audit/audit/`,
       {
         method: "POST",
         headers: {
@@ -99,17 +107,19 @@ const Header = () => {
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       }
      );
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Server responded with:", errorData);
         throw new Error("Failed to create audit");
       }
 
       const result = await response.json();
 
-      const auditId = result.result.audit.audit_id;
+      const auditId = result.result.transactionHash;
 
       sessionStorage.setItem("auditId", auditId);
 
@@ -132,8 +142,8 @@ const Header = () => {
       );
       closeAuditModal();
     } catch (error) {
-      console.error("Error creating audit:", error);
-      toast.error("🦄 Error creating audit", {
+      console.error("Error creating audit from catch:", error);
+      toast.error("🦄 Error creating audit from catch", {
         position: "bottom-center",
         autoClose: 5000,
         hideProgressBar: false,
