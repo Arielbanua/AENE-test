@@ -5,7 +5,7 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
   const [walletAddress, setWalletAddress] = useState("");
   const [to, setTo] = useState("");
   const [contractAddress, setContractAddress] = useState("");
-  const [file, setFile] = useState("");
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -14,15 +14,7 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Audit Data:', {
-        walletAddress: walletAddress,
-        to:to,
-        contractAddress: contractAddress,
-        file: file,
-        name: name,
-        description: description,
-        callbackUrl: callbackUrl,
-      });
+    console.log('sending data');
     onSubmit({ 
         walletAddress, 
         to, 
@@ -73,13 +65,12 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
           </div>
           <div className="mb-4">
             <label htmlFor="file" className="block mb-2">
-              file
+              File
             </label>
             <input
               type="file"
               id="file"
-              value={file}
-              onChange={(e) => setFile(e.target.value)}
+              onChange={(e) => setUploadedFile(e.target.files[0])}
               className="w-full px-3 py-2 border rounded-md"
               required
             />

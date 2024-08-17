@@ -101,49 +101,46 @@ const Header = () => {
   // create certificate funciton
   const handleCertificateSubmit = async (data) => {
     try {
-      const payload = {
-        walletAddress: data.walletAddress,
-        to:data.to,
-        contractAddress: data.contractAddress,
-        file: data.file,
-        name: data.name,
-        description: data.description,
-        callback_url: "https://postman-echo.com/post?"  // Ensure this is added to the payload
-      };
+      const createFormData = (data) => {
+        const formData = new FormData();
+        formData.append('walletAddress', data.walletAddress);
+        formData.append('to', data.to);
+        formData.append('contractAddress', data.contractAddress);
+        formData.append('file', data.file); // Ensure this is a File object
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('callback_url', "https://postman-echo.com/post?");
+        return formData;
+    };
   
-      console.log("Sending data:", JSON.stringify(payload));
-     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
-      {
-        method: "POST",
-        headers: {
-          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-     );
-
+    const sendCertificateRequest = async (formData) => {
+      console.log("Sending certificate data:", formData);
+      const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
+          {
+              method: 'POST',
+              headers: {
+                  client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+                  client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+                  // Content-Type is not needed for FormData
+              },
+              body: formData,
+          }
+      );
+  
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Server responded with:", errorData);
-        throw new Error("Failed to create certificate");
+          const errorData = await response.json();
+          console.error("Server responded with:", errorData);
+          throw new Error("Failed to create certificate");
       }
+  
+      return response.json();
+  };
 
-      const result = await response.json();
-
-      const certificateId = result.result.transactionHash;
-
-      sessionStorage.setItem("certificateId", certificateId);
-
-      if (!certificateId) {
-        throw new Error("Certificate ID not found in the response");
-      }
-      toast.success(
-        `🦄 Certificate created successfully!
-        Certificate ID: ${certificateId}`,
-        {
+  }
+  catch (error) {
+      console.error("Error creating certificate:", error);
+      toast.error("🦄 Error creating certificate", {
           position: "bottom-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -152,25 +149,9 @@ const Header = () => {
           draggable: true,
           progress: undefined,
           theme: "light",
-        }
-      );
-      closeCertificateModal();
-    } catch (error) {
-      console.error("Error creating certificate from catch:", error);
-      toast.error("🦄 Error creating certificate from catch", {
-        position: "bottom-center",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
       });
-      // Don't send the request if there's an error
-      return;
-    }
-  };
+  }
+};
 
   const handleAuditSubmit = async (data) => {
     try {
@@ -246,7 +227,7 @@ const Header = () => {
     <header className="w-full py-6 lg:py-4 relative border-b">
       <div className="container mx-auto px-8 lg:px-4 flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-xl font-bold">Maschain Demo</h1>
+          <h1 className="text-xl font-bold">Maschain Project</h1>
         </div>
         <div className="flex space-x-4">
           {/* Create Wallet Button */}
