@@ -98,49 +98,36 @@ const Header = () => {
     }
   };
 
-  // create certificate funciton
-  const handleCertificateSubmit = async (data) => {
+  const handleCertificateSubmit = async (formData) => {
     try {
-      const createFormData = (data) => {
-        const formData = new FormData();
-        formData.append('walletAddress', data.walletAddress);
-        formData.append('to', data.to);
-        formData.append('contractAddress', data.contractAddress);
-        formData.append('file', data.file); // Ensure this is a File object
-        formData.append('name', data.name);
-        formData.append('description', data.description);
-        formData.append('callback_url', "https://postman-echo.com/post?");
-        return formData;
-    };
-  
-    const sendCertificateRequest = async (formData) => {
-      console.log("Sending certificate data:", formData);
       const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
-          {
-              method: 'POST',
-              headers: {
-                  client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-                  client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-                  // Content-Type is not needed for FormData
-              },
-              body: formData,
-          }
+        `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/mint-certificate`,
+        {
+          method: 'POST',
+          headers: {
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          },
+          body: formData,
+        }
       );
   
       if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Server responded with:", errorData);
-          throw new Error("Failed to create certificate");
+        const errorData = await response.json();
+        console.error("Server responded with:", errorData);
+        throw new Error("Failed to create certificate");
       }
   
-      return response.json();
-  };
-
-  }
-  catch (error) {
-      console.error("Error creating certificate:", error);
-      toast.error("🦄 Error creating certificate", {
+      const result = await response.json();
+      const certificateId = result.result.transactionHash; // Adjust based on actual response
+  
+      if (!certificateId) {
+        throw new Error("Certificate ID not found in the response");
+      }
+  
+      toast.success(
+        `🦄 Certificate created successfully! Certificate ID: ${certificateId}`,
+        {
           position: "bottom-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -149,9 +136,23 @@ const Header = () => {
           draggable: true,
           progress: undefined,
           theme: "light",
+        }
+      );
+      closeCertificateModal();
+    } catch (error) {
+      console.error("Error creating certificate:", error);
+      toast.error("🦄 Error creating certificate", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
       });
-  }
-};
+    }
+  };
 
   const handleAuditSubmit = async (data) => {
     try {
@@ -224,106 +225,106 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full py-6 lg:py-4 relative border-b">
+    <header className="w-full py-6 lg:py-4 relative border-b" style={{ backgroundColor: "lightblue" }}>
       <div className="container mx-auto px-8 lg:px-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold">Maschain Project</h1>
-        </div>
-        <div className="flex space-x-4">
-          {/* Create Wallet Button */}
-          <button
-            onClick={openModal}
-            className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
-          >
-            {typeof window !== "undefined" &&
-            window.sessionStorage.getItem("walletAddress") ? (
-              <span className="text-sm">
-                {`${window.sessionStorage
-                  .getItem("walletAddress")
-                  .slice(0, 6)}...${window.sessionStorage
-                  .getItem("walletAddress")
-                  .slice(-4)}`}
-              </span>
-            ) : (
-              "Create Wallet"
-            )}
-          </button>
-  
-          {/* Create Audit Button */}
-          <button
-            onClick={openAuditModal} // Function to open the audit modal
-            className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
-          >
-            Create Audit
-          </button>
+      <div className="flex items-center">
+        <h1 className="text-xl font-bold">Maschain Project</h1>
+      </div>
+      <div className="flex space-x-4">
+        {/* Create Wallet Button */}
+        <button
+        onClick={openModal}
+        className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+        >
+        {typeof window !== "undefined" &&
+        window.sessionStorage.getItem("walletAddress") ? (
+          <span className="text-sm">
+          {`${window.sessionStorage
+            .getItem("walletAddress")
+            .slice(0, 6)}...${window.sessionStorage
+            .getItem("walletAddress")
+            .slice(-4)}`}
+          </span>
+        ) : (
+          "Create Wallet"
+        )}
+        </button>
+    
+        {/* Create Audit Button */}
+        <button
+        onClick={openAuditModal} // Function to open the audit modal
+        className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+        >
+        Create Audit
+        </button>
 
-          {/* Create Certificate Button */}
-          <button
-            onClick={openCertificateModal} // Function to open the certificate modal
-            className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
-          >
-            Create Certificate
-          </button>
-        </div>
+        {/* Create Certificate Button */}
+        <button
+        onClick={openCertificateModal} // Function to open the certificate modal
+        className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+        >
+        Create Certificate
+        </button>
+      </div>
       </div>
       <AnimatePresence>
-        {/* Wallet Modal */}
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-          >
-            <CreateWalletModal onSubmit={handleSubmit} onClose={closeModal} />
-          </motion.div>
-        )}
-  
-        {/* Audit Modal */}
-        {isAuditModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-          >
-            <CreateAuditModal
-              onSubmit={handleAuditSubmit} // Function to handle audit form submission
-              onClose={closeAuditModal} // Function to close the audit modal
-            />
-          </motion.div>
-        )}
+      {/* Wallet Modal */}
+      {isModalOpen && (
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
+        >
+        <CreateWalletModal onSubmit={handleSubmit} onClose={closeModal} />
+        </motion.div>
+      )}
+    
+      {/* Audit Modal */}
+      {isAuditModalOpen && (
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
+        >
+        <CreateAuditModal
+          onSubmit={handleAuditSubmit} // Function to handle audit form submission
+          onClose={closeAuditModal} // Function to close the audit modal
+        />
+        </motion.div>
+      )}
 
-        {/* Certificate Modal */}
-        {isCertificateModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-          >
-            <CreateCertificateModal
-              onSubmit={handleCertificateSubmit} // Function to handle audit form submission
-              onClose={closeCertificateModal} // Function to close the audit modal
-            />
-          </motion.div>
-        )}
+      {/* Certificate Modal */}
+      {isCertificateModalOpen && (
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
+        >
+        <CreateCertificateModal
+          onSubmit={handleCertificateSubmit} // Function to handle audit form submission
+          onClose={closeCertificateModal} // Function to close the audit modal
+        />
+        </motion.div>
+      )}
 
       </AnimatePresence>
       <ToastContainer
-        position="bottom-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
+      position="bottom-center"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
       />
     </header>
-  );
+    );
   };
 
 export default Header;

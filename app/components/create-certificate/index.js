@@ -1,38 +1,51 @@
 "use client";
 import React, { useState } from "react";
+import PropTypes from 'prop-types';
 
 const CreateCertificateModal = ({ onSubmit, onClose }) => {
   const [walletAddress, setWalletAddress] = useState("");
   const [to, setTo] = useState("");
   const [contractAddress, setContractAddress] = useState("");
-  const [uploadedFile, setUploadedFile] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-
-  const callbackUrl = "https://postman-echo.com/post?";
-//sdf   const fixedContractAddress = "0xC523A5A3E2A037c9c9fd81fB962db1f87A1ea4A3";
+  const [error, setError] = useState(""); // State for error messages
+  const [uploadedFile, setUploadedFile] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('sending data');
-    onSubmit({ 
-        walletAddress, 
-        to, 
-        contractAddress, 
-        file, 
-        name, 
-        description, 
-        callbackUrl 
-    });
+  
+    if (!uploadedFile) {
+      setError("File is required");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('wallet_address', walletAddress);
+    formData.append('to', to);
+    formData.append('contract_address', contractAddress);
+    formData.append('file', uploadedFile);
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('callback_url', "https://postman-echo.com/post?");
+  
+
+    // Log FormData values before sending
+    for (let key of formData.keys()) {
+      console.log(`${key}:`, formData.get(key));
+    }
+    
+    onSubmit(formData);
   };
+  
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center backdrop-blur-md">
       <div className="bg-white p-8 rounded-lg shadow-lg lg:w-96 w-3/4">
         <h2 className="text-2xl font-bold mb-8">Create Certificate</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="walletAddress" className="block mb-2"> Wallet Address</label>
+            <label htmlFor="walletAddress" className="block mb-2">Wallet Address</label>
             <input
               type="text"
               id="walletAddress"
@@ -64,21 +77,17 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="file" className="block mb-2">
-              File
-            </label>
+            <label htmlFor="file" className="block mb-2">File</label>
             <input
               type="file"
               id="file"
-              onChange={(e) => setUploadedFile(e.target.files[0])}
+              onChange={(e) => setUploadedFile(e.currentTarget.files[0])}
               className="w-full px-3 py-2 border rounded-md"
               required
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="name" className="block mb-2">
-              Name
-            </label>
+            <label htmlFor="name" className="block mb-2">Name</label>
             <input
               type="text"
               id="name"
@@ -89,9 +98,7 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="description" className="block mb-2">
-              Description
-            </label>
+            <label htmlFor="description" className="block mb-2">Description</label>
             <input
               type="text"
               id="description"
@@ -120,6 +127,12 @@ const CreateCertificateModal = ({ onSubmit, onClose }) => {
       </div>
     </div>
   );
+};
+
+// PropTypes for validation
+CreateCertificateModal.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
 export default CreateCertificateModal;
