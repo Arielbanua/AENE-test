@@ -46,7 +46,3 @@ This project was developed for the DevMatch Hackathon, focusing on secure and ef
 3. **Patient Record Management**: Patient records are stored using smart contracts, providing an immutable and secure method of data storage. Each interaction is logged in the blockchain, ensuring transparency.
 
 4. **Audit Trails**: Every action taken within the system is recorded on the blockchain, providing a complete audit trail for all transactions and modifications.
-
-
-
-Feel free to customize this template further based on your project's specifics!
