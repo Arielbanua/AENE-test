@@ -1,41 +1,14 @@
-# This is a project template for APUBCC Devmatch 2024 Hackathon
+#Healthcare Management System Using Blockchain
+This project was developed for the DevMatch Hackathon, focusing on secure and efficient patient record management utilizing blockchain technology. Built using MasChain and Node.js, the system leverages smart contracts, certificates, audit trails, and user wallet management to ensure the integrity and confidentiality of patient data.
 
-The purpose of this template is to facilitate new developers to quickly get a hands-on approach and start developing using Maschain's API.  
-Test it out [HERE](https://maschainworkshop.vercel.app/)
+##Features
+User Wallet Management: Securely create and manage user wallets through the MasChain portal.
+Certificate Creation: Generate certificates for various healthcare processes.
+Patient Record Management: Create and manage patient records using smart contracts, ensuring data integrity and security.
+Audit Trails: Maintain a transparent and immutable audit trail for all actions performed on the blockchain.
 
-This project sets up the basic functions such as:
-
-1. Creating User Wallet
-2. Minting Token
-3. Transferring Token
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## Obtain Necessary Keys from Maschain
-
-Navigate to https://portal-testnet.maschain.com/ to get the necessary keys.
-
-In the .env.example file, replace the values with your own key, and rename the file to just ".env" or ".env.local"
-
-# Have fun building
-
-```bash
-Contact me or the team if you have any questions
-@OxBenjamintan - AKA LengzaiBen
-```
+##Technology Stack
+Blockchain Platform: MasChain
+Backend: Node.js
+Smart Contracts: Utilized for patient record management and certification processes.
+MasChain Portal: Used for managing user wallets and integrating blockchain features.
