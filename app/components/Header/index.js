@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import CreateWalletModal from "../Create-wallet";
 import CreateAuditModal from "../create-audit-trail";
 import CreateCertificateModal from "../create-certificate";
+import GetCertificateModal from "../get-certificate";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +12,8 @@ const Header = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState(false);
+  const [isGetCertificateModalOpen, setIsGetCertificateModalOpen] = useState(false);
+
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -24,6 +27,10 @@ const Header = () => {
     setIsCertificateModalOpen(true);
   }
 
+  const openGetCertificateModal = () => {
+    setIsGetCertificateModalOpen(true);
+  }
+
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -34,6 +41,10 @@ const Header = () => {
 
   const closeCertificateModal = () => {
     setIsCertificateModalOpen(false);
+  };
+
+  const closeGetCertificateModal = () => {
+    setIsGetCertificateModalOpen(false);
   };
 
   const handleSubmit = async (data) => {
@@ -224,6 +235,74 @@ const Header = () => {
     }
   };
 
+  const handleGetCertificateSubmit = async (data) => {
+    try {
+      const payload = {
+        to: data.to  // Ensure this is added to the payload
+      };
+  
+      console.log("Sending data:", JSON.stringify(payload));
+     const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/get-certificate?to={to}`,
+      {
+        method: "GET", 
+        headers: {
+          client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+          client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+          "Content-Type": "application/json",
+        },
+        params: {
+          to: data.to
+        },
+      }
+     );
+
+     if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Server responded with:", errorData);
+      throw new Error("Failed to create certificate");
+    }
+
+    const result = await response.json();
+    const certificateId = result.result.transactionHash; // Adjust based on actual response
+
+    if (!certificateId) {
+      throw new Error("Certificate ID not found in the response");
+    }
+    
+      toast.success(
+        `🦄 Audit created successfully!
+        Audit ID: ${auditId}`,
+        {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
+      closeAuditModal();
+    } catch (error) {
+      console.error("Error creating audit from catch:", error);
+      toast.error("🦄 Error creating audit from catch", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      // Don't send the request if there's an error
+      return;
+    }
+  };
+
+
   return (
     <header className="w-full py-6 lg:py-4 relative border-b" style={{ backgroundColor: "lightblue" }}>
       <div className="container mx-auto px-8 lg:px-4 flex items-center justify-between">
@@ -264,6 +343,14 @@ const Header = () => {
         className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
         >
         Create Certificate
+        </button>
+
+        {/* Create get Certificate Button */}
+        <button
+        onClick={openGetCertificateModal} // Function to open the get certificate modal
+        className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300"
+        >
+        get Certificate
         </button>
       </div>
       </div>
@@ -326,5 +413,7 @@ const Header = () => {
     </header>
     );
   };
+
+  
 
 export default Header;
