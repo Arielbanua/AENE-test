@@ -397,6 +397,21 @@ const Header = () => {
         </motion.div>
       )}
 
+      {/* Get Certificate Modal */}
+      {isGetCertificateModalOpen && (
+        <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
+        >
+        <GetCertificateModal
+          onSubmit={handleGetCertificateSubmit} // Function to handle audit form submission
+          onClose={closeGetCertificateModal} // Function to close the audit modal
+        />
+        </motion.div>
+      )}
+
       </AnimatePresence>
       <ToastContainer
       position="bottom-center"

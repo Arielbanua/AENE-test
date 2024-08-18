@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import MintTokenModal from "./components/Mint-token";
 import TransferTokenModal from "./components/Transfer-token";
+import AuditDataDisplay from "./components/display-audit";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -199,6 +200,7 @@ export default function Home() {
           "Please Create a Wallet First!"
         )}
       </p>
+      <AuditDataDisplay />
       <AnimatePresence>
         {isMintModalOpen && (
           <motion.div
