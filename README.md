@@ -1,7 +1,3 @@
-Here’s a `README.md` template for your Healthcare Management project using blockchain:
-
----
-
 # Healthcare Management System Using Blockchain
 
 This project was developed for the DevMatch Hackathon, focusing on secure and efficient patient record management utilizing blockchain technology. Built using MasChain and Node.js, the system leverages smart contracts, certificates, audit trails, and user wallet management to ensure the integrity and confidentiality of patient data.
@@ -51,18 +47,6 @@ This project was developed for the DevMatch Hackathon, focusing on secure and ef
 
 4. **Audit Trails**: Every action taken within the system is recorded on the blockchain, providing a complete audit trail for all transactions and modifications.
 
-## Contribution
 
-If you wish to contribute to this project, please fork the repository and submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For any questions or inquiries, please reach out to `your.email@example.com`.
-
----
 
 Feel free to customize this template further based on your project's specifics!
