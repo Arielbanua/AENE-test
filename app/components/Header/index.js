@@ -243,17 +243,15 @@ const Header = () => {
   
       console.log("Sending data:", JSON.stringify(payload));
      const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/get-certificate?to={to}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/certificate/get-certificate`,
       {
         method: "GET", 
         headers: {
           client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
           client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
           "Content-Type": "application/json",
-        },
-        params: {
-          to: data.to
-        },
+        }
+        
       }
      );
 
@@ -264,15 +262,11 @@ const Header = () => {
     }
 
     const result = await response.json();
-    const certificateId = result.result.transactionHash; // Adjust based on actual response
-
-    if (!certificateId) {
-      throw new Error("Certificate ID not found in the response");
-    }
+    console.log("Result:", result);
     
       toast.success(
-        `🦄 Audit created successfully!
-        Audit ID: ${auditId}`,
+        `🦄 get audit successfully!
+       `,
         {
           position: "bottom-center",
           autoClose: 5000,
