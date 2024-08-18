@@ -32,7 +32,7 @@ const AuditDataDisplay = () => {
 
   return (
     <div>
-      <button onClick={fetchAuditData} disabled={isLoading}>
+      <button onClick={fetchAuditData} className="border rounded-md py-2 px-4 hover:bg-black hover:text-white transition-all duration-300" disabled={isLoading}>
         {isLoading ? 'Loading...' : 'Fetch Audit Data'}
       </button>
       {error && <p>Error: {error}</p>}
